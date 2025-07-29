@@ -297,6 +297,8 @@
                 profileBtn.style.display = 'inline';
                 logoutBtn.style.display = 'inline';
                 userEmail.textContent = `Logged in as: ${user.email || user.displayName}`;
+                homeSection.style.display = 'none';
+                profileSection.style.display = 'block';
             } else {
                 loginBtn.style.display = 'inline';
                 signupBtn.style.display = 'inline';
@@ -308,16 +310,19 @@
             }
         });
 
-        // Open sign-up modal
-        getStartedBtn.addEventListener('click', () => {
-            signupModal.style.display = 'flex';
-        });
-        signupBtn.addEventListener('click', () => {
+        // Event listeners for buttons
+        getStartedBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             signupModal.style.display = 'flex';
         });
 
-        // Open login modal
-        loginBtn.addEventListener('click', () => {
+        signupBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            signupModal.style.display = 'flex';
+        });
+
+        loginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             loginModal.style.display = 'flex';
         });
 
@@ -335,11 +340,19 @@
             loginModal.style.display = 'none';
         });
 
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === signupModal) signupModal.style.display = 'none';
+            if (e.target === emailSignupModal) emailSignupModal.style.display = 'none';
+            if (e.target === detailsModal) detailsModal.style.display = 'none';
+            if (e.target === loginModal) loginModal.style.display = 'none';
+        });
+
         // Google Sign-In
         function signInWithGoogle() {
             const provider = new firebase.auth.GoogleAuthProvider();
             auth.signInWithPopup(provider)
-                .then(result => {
+                .then(() => {
                     signupModal.style.display = 'none';
                     window.location.href = 'chatbot.html';
                 })
@@ -354,6 +367,11 @@
 
         // Show details form after email
         function showDetailsForm() {
+            const email = document.getElementById('signup-email').value;
+            if (!email) {
+                alert('Please enter an email');
+                return;
+            }
             emailSignupModal.style.display = 'none';
             detailsModal.style.display = 'flex';
         }
@@ -413,7 +431,8 @@
         }
 
         // Profile page navigation
-        profileBtn.addEventListener('click', () => {
+        profileBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             homeSection.style.display = 'none';
             profileSection.style.display = 'block';
         });
