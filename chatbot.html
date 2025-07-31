@@ -65,4 +65,93 @@
             width: 100%;
             top: 0;
             z-index: 1000;
-            boxJonah Hill, The Big Short, La La Land, and more, have been praised for their authentic portrayals of the financial industry, music industry, and Hollywood, blending sharp social commentary with compelling narratives. Their success lies in balancing entertainment with insightful critique, making them resonate with audiences and critics alike.
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        header .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00aaff;
+        }
+        header nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin-left: 1.5rem;
+            font-size: 1rem;
+            transition: color 0.3s;
+        }
+        header nav a:hover {
+            color: #00aaff;
+        }
+        .chatbot-section {
+            padding: 2rem;
+            text-align: center;
+            background: #161b22;
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+        .chatbot-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        iframe {
+            width: 100%;
+            max-width: 800px;
+            height: 600px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyADcAkqXqSZ_crzAaMCNu6IWUYQS5ZWrIY",
+            authDomain: "sign-up-login-d1723.firebaseapp.com",
+            projectId: "sign-up-login-d1723",
+            storageBucket: "sign-up-login-d1723.firebasestorage.app",
+            messagingSenderId: "94024367004",
+            appId: "1:94024367004:web:b0c513729231a06da3a659",
+            measurementId: "G-XKX2CPZMQE"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // DOM elements
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // Logout
+        logoutBtn.addEventListener('click', () => {
+            signOut(auth)
+                .then(() => {
+                    window.location.href = 'index.html';
+                })
+                .catch(error => alert(error.message));
+        });
+
+        // Ensure iframe loads
+        window.onload = function() {
+            const iframe = document.querySelector('iframe');
+            iframe.onload = () => console.log('Chatbot loaded successfully');
+            iframe.onerror = () => console.error('Error loading chatbot');
+        };
+    </script>
+</head>
+<body>
+    <header>
+        <div class="logo">DPhSolver</div>
+        <nav>
+            <a href="#" id="logout-btn">Logout</a>
+        </nav>
+    </header>
+
+    <section class="chatbot-section">
+        <h2>Physics Problem Solver Chatbot</h2>
+        <iframe src="https://your-username-physics-chatbot.hf.space" title="DPhSolver Chatbot"></iframe>
+    </section>
+</body>
+</html>
