@@ -37,13 +37,29 @@
         }
         return gk_fileData[filename] || "";
         }
-        </script><!DOCTYPE html>
+</script>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DPhSolver</title>
+    <title>DPhSolver: Free AI-Powered Physics Problem Solver</title>
+    <meta name="description" content="Solve physics problems online with DPhSolver's free AI-powered chatbot. Use our Runge-Kutta solver for differential equations and get instant solutions.">
+    <meta name="keywords" content="AI physics solver, solve physics problems online, Runge-Kutta solver, differential equation solver, free ODE solver, DPhSolver">
+    <meta name="author" content="Dharmik Patel">
+    <meta name="robots" content="index, follow">
     <meta name="google-site-verification" content="UCwhSn22TTKUxSt68MZJ58JR-UCA_7KUnZKxPJMao5U" />
+    <!-- Open Graph for social sharing -->
+    <meta property="og:title" content="DPhSolver: Free AI-Powered Physics Problem Solver">
+    <meta property="og:description" content="Solve physics problems with ease using DPhSolver's AI chatbot and Runge-Kutta solver for differential equations. Free, fast, and accurate.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1451187580459-434902d8b723">
+    <meta property="og:url" content="https://dharmik999.github.io/DPhSolver/">
+    <meta property="og:type" content="website">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="DPhSolver: Free AI-Powered Physics Problem Solver">
+    <meta name="twitter:description" content="Solve physics problems with DPhSolver's AI chatbot and Runge-Kutta solver. Free and accurate solutions for students and educators.">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1451187580459-434902d8b723">
     <style>
         * {
             margin: 0;
@@ -191,6 +207,20 @@
             color: #00aaff;
             margin-bottom: 2rem;
         }
+        .seo-content {
+            padding: 2rem;
+            text-align: center;
+            background: #161b22;
+        }
+        .seo-content h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+        .seo-content p {
+            font-size: 1rem;
+            max-width: 800px;
+            margin: 0 auto 1rem;
+        }
     </style>
     <script type="module">
         // Import Firebase SDK
@@ -286,15 +316,32 @@
             profileSection.style.display = 'block';
         });
     </script>
+    <!-- Schema Markup for Software Application -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "DPhSolver",
+        "operatingSystem": "Web",
+        "applicationCategory": "EducationalApplication",
+        "description": "DPhSolver is a free AI-powered chatbot for solving physics problems and differential equations using the Runge-Kutta method.",
+        "url": "https://dharmik999.github.io/DPhSolver/",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        }
+    }
+    </script>
 </head>
 <body>
     <header>
         <div class="logo">DPhSolver</div>
         <nav>
-            <a href="#" id="login-btn">Login</a>
-            <a href="#" id="signup-btn">Sign Up</a>
-            <a href="#" id="profile-btn" style="display: none;">Profile</a>
-            <a href="#" id="logout-btn" style="display: none;">Logout</a>
+            <a href="#" id="login-btn" aria-label="Login to DPhSolver">Login</a>
+            <a href="#" id="signup-btn" aria-label="Sign Up for DPhSolver">Sign Up</a>
+            <a href="#" id="profile-btn" style="display: none;" aria-label="View Your Profile">Profile</a>
+            <a href="#" id="logout-btn" style="display: none;" aria-label="Logout from DPhSolver">Logout</a>
         </nav>
     </header>
 
@@ -302,25 +349,33 @@
         <div class="hero-content">
             <h1>Welcome to DPhSolver</h1>
             <p>Solve physics problems with ease using our AI-powered chatbot.</p>
-            <button class="btn" id="get-started-btn">Get Started</button>
+            <button class="btn" id="get-started-btn" aria-label="Get Started with DPhSolver">Get Started</button>
         </div>
     </section>
 
     <section id="profile-section">
         <h2>Your Profile</h2>
         <p id="user-email"></p>
-        <button class="btn" onclick="window.location.href='chatbot.html'">Go to Chatbot</button>
-        <button class="btn" id="logout-profile-btn" onclick="logout()">Logout</button>
+        <button class="btn" onclick="window.location.href='chatbot.html'" aria-label="Go to DPhSolver Chatbot">Go to Chatbot</button>
+        <button class="btn" id="logout-profile-btn" onclick="logout()" aria-label="Logout from Profile">Logout</button>
     </section>
 
     <!-- Sign Up/Login Modal (Google only) -->
     <div class="modal" id="signup-modal">
         <div class="modal-content">
-            <span class="close" id="close-signup">&times;</span>
+            <span class="close" id="close-signup" aria-label="Close Sign Up Modal">&times;</span>
             <h2>Sign Up / Login</h2>
-            <button class="btn" onclick="signInWithGoogle()">Sign Up with Google</button>
+            <button class="btn" onclick="signInWithGoogle()" aria-label="Sign Up or Login with Google">Sign Up with Google</button>
         </div>
     </div>
 
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'973a95c7ef81e61a',t:'MTc1NTk1MTg0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+    <!-- SEO Content Section -->
+    <section class="seo-content">
+        <h2>Solve Physics Problems with DPhSolver</h2>
+        <p>DPhSolver is your go-to tool for solving physics problems and differential equations online. Powered by AI, our chatbot provides accurate solutions using advanced numerical methods like Runge-Kutta. Perfect for students, educators, and professionals.</p>
+        <p>Whether you're tackling ordinary differential equations (ODEs) or complex physics calculations, DPhSolver offers a free, user-friendly platform to get instant results. Sign up with Google to access our AI chatbot and start solving today!</p>
+    </section>
+
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'973a95c7ef81e61a',t:'MTc1NTk1MTg0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
 </html>
