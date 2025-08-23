@@ -37,7 +37,8 @@
         }
         return gk_fileData[filename] || "";
         }
-        </script><!DOCTYPE html>
+</script>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -195,7 +196,7 @@
     <script type="module">
         // Import Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, updateProfile, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
         // Firebase configuration
         const firebaseConfig = {
@@ -212,12 +213,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // Action Code Settings for email link
-        const actionCodeSettings = {
-            url: window.location.href,
-            handleCodeInApp: true
-        };
-
         // DOM elements
         const getStartedBtn = document.getElementById('get-started-btn');
         const loginBtn = document.getElementById('login-btn');
@@ -229,13 +224,7 @@
         const profileSection = document.getElementById('profile-section');
         const userEmail = document.getElementById('user-email');
         const signupModal = document.getElementById('signup-modal');
-        const emailSignupModal = document.getElementById('email-signup-modal');
-        const detailsModal = document.getElementById('details-modal');
-        const loginModal = document.getElementById('login-modal');
         const closeSignup = document.getElementById('close-signup');
-        const closeEmailSignup = document.getElementById('close-email-signup');
-        const closeDetails = document.getElementById('close-details');
-        const closeLogin = document.getElementById('close-login');
 
         // Check auth state
         auth.onAuthStateChanged(user => {
@@ -256,59 +245,20 @@
             }
         });
 
-        // Handle email link sign-in on page load
-        if (isSignInWithEmailLink(auth, window.location.href)) {
-            let email = window.localStorage.getItem('emailForSignIn');
-            if (!email) {
-                email = window.prompt('Please provide your email for confirmation');
-            }
-            signInWithEmailLink(auth, email, window.location.href)
-                .then((result) => {
-                    window.localStorage.removeItem('emailForSignIn');
-                    const isSignup = window.localStorage.getItem('isSignup');
-                    if (isSignup) {
-                        const firstName = window.localStorage.getItem('firstName');
-                        const lastName = window.localStorage.getItem('lastName');
-                        updateProfile(result.user, {
-                            displayName: `${firstName} ${lastName}`
-                        }).then(() => {
-                            window.localStorage.removeItem('isSignup');
-                            window.localStorage.removeItem('firstName');
-                            window.localStorage.removeItem('lastName');
-                        });
-                    }
-                    window.location.href = 'chatbot.html';
-                })
-                .catch((error) => {
-                    alert(error.message);
-                });
-        }
-
-        // Open sign-up modal
+        // Open sign-up/login modal (both trigger Google Sign-In)
         getStartedBtn.addEventListener('click', () => {
             signupModal.classList.add('show');
         });
         signupBtn.addEventListener('click', () => {
             signupModal.classList.add('show');
         });
-
-        // Open login modal
         loginBtn.addEventListener('click', () => {
-            loginModal.classList.add('show');
+            signupModal.classList.add('show');
         });
 
-        // Close modals
+        // Close modal
         closeSignup.addEventListener('click', () => {
             signupModal.classList.remove('show');
-        });
-        closeEmailSignup.addEventListener('click', () => {
-            emailSignupModal.classList.remove('show');
-        });
-        closeDetails.addEventListener('click', () => {
-            detailsModal.classList.remove('show');
-        });
-        closeLogin.addEventListener('click', () => {
-            loginModal.classList.remove('show');
         });
 
         // Google Sign-In
@@ -318,58 +268,6 @@
                 .then(result => {
                     signupModal.classList.remove('show');
                     window.location.href = 'chatbot.html';
-                })
-                .catch(error => alert(error.message));
-        };
-
-        // Show email sign-up modal
-        window.showEmailSignUp = function() {
-            signupModal.classList.remove('show');
-            emailSignupModal.classList.add('show');
-        };
-
-        // Show details form after email
-        window.showDetailsForm = function() {
-            emailSignupModal.classList.remove('show');
-            detailsModal.classList.add('show');
-        };
-
-        // Complete email sign-up (passwordless)
-        window.completeSignUp = function() {
-            const email = document.getElementById('signup-email').value;
-            const firstName = document.getElementById('first-name').value;
-            const lastName = document.getElementById('last-name').value;
-
-            if (!email || !firstName || !lastName) {
-                alert('Please fill in all fields');
-                return;
-            }
-
-            sendSignInLinkToEmail(auth, email, actionCodeSettings)
-                .then(() => {
-                    window.localStorage.setItem('emailForSignIn', email);
-                    window.localStorage.setItem('isSignup', 'true');
-                    window.localStorage.setItem('firstName', firstName);
-                    window.localStorage.setItem('lastName', lastName);
-                    alert('Sign-up link sent to your email. Please check and click the link to complete.');
-                    detailsModal.classList.remove('show');
-                })
-                .catch(error => alert(error.message));
-        };
-
-        // Login (passwordless)
-        window.login = function() {
-            const email = document.getElementById('login-email').value;
-            if (!email) {
-                alert('Please enter email');
-                return;
-            }
-            sendSignInLinkToEmail(auth, email, actionCodeSettings)
-                .then(() => {
-                    window.localStorage.setItem('emailForSignIn', email);
-                    window.localStorage.removeItem('isSignup');
-                    alert('Sign-in link sent to your email. Please check and click the link.');
-                    loginModal.classList.remove('show');
                 })
                 .catch(error => alert(error.message));
         };
@@ -416,45 +314,15 @@
         <button class="btn" id="logout-profile-btn" onclick="logout()">Logout</button>
     </section>
 
-    <!-- Sign Up Modal -->
+    <!-- Sign Up/Login Modal (Google Only) -->
     <div class="modal" id="signup-modal">
         <div class="modal-content">
             <span class="close" id="close-signup">&times;</span>
-            <h2>Sign Up</h2>
-            <button class="btn" onclick="signInWithGoogle()">Sign Up with Google</button>
-            <button class="btn" onclick="showEmailSignUp()">Sign Up with Email</button>
+            <h2>Sign Up / Login</h2>
+            <button class="btn" onclick="signInWithGoogle()">Sign In with Google</button>
         </div>
     </div>
 
-    <!-- Email Sign Up Form Modal -->
-    <div class="modal" id="email-signup-modal">
-        <div class="modal-content">
-            <span class="close" id="close-email-signup">&times;</span>
-            <h2>Enter Email</h2>
-            <input type="email" id="signup-email" placeholder="Email" required>
-            <button class="btn" onclick="showDetailsForm()">Next</button>
-        </div>
-    </div>
-
-    <!-- Details Form Modal -->
-    <div class="modal" id="details-modal">
-        <div class="modal-content">
-            <span class="close" id="close-details">&times;</span>
-            <h2>Complete Sign Up</h2>
-            <input type="text" id="first-name" placeholder="First Name" required>
-            <input type="text" id="last-name" placeholder="Last Name" required>
-            <button class="btn" onclick="completeSignUp()">Submit</button>
-        </div>
-    </div>
-
-    <!-- Login Modal -->
-    <div class="modal" id="login-modal">
-        <div class="modal-content">
-            <span class="close" id="close-login">&times;</span>
-            <h2>Login</h2>
-            <input type="email" id="login-email" placeholder="Email" required>
-            <button class="btn" onclick="login()">Login</button>
-        </div>
-    </div>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'973a95c7ef81e61a',t:'MTc1NTk1MTg0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'973a95c7ef81e61a',t:'MTc1NTk1MTg0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
 </html>
