@@ -195,7 +195,7 @@
     <script type="module">
         // Import Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, updateProfile, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
         // Firebase configuration
         const firebaseConfig = {
@@ -211,6 +211,12 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+
+        // Action Code Settings for email link
+        const actionCodeSettings = {
+            url: window.location.href,
+            handleCodeInApp: true
+        };
 
         // DOM elements
         const getStartedBtn = document.getElementById('get-started-btn');
@@ -249,6 +255,34 @@
                 profileSection.style.display = 'none';
             }
         });
+
+        // Handle email link sign-in on page load
+        if (isSignInWithEmailLink(auth, window.location.href)) {
+            let email = window.localStorage.getItem('emailForSignIn');
+            if (!email) {
+                email = window.prompt('Please provide your email for confirmation');
+            }
+            signInWithEmailLink(auth, email, window.location.href)
+                .then((result) => {
+                    window.localStorage.removeItem('emailForSignIn');
+                    const isSignup = window.localStorage.getItem('isSignup');
+                    if (isSignup) {
+                        const firstName = window.localStorage.getItem('firstName');
+                        const lastName = window.localStorage.getItem('lastName');
+                        updateProfile(result.user, {
+                            displayName: `${firstName} ${lastName}`
+                        }).then(() => {
+                            window.localStorage.removeItem('isSignup');
+                            window.localStorage.removeItem('firstName');
+                            window.localStorage.removeItem('lastName');
+                        });
+                    }
+                    window.location.href = 'chatbot.html';
+                })
+                .catch((error) => {
+                    alert(error.message);
+                });
+        }
 
         // Open sign-up modal
         getStartedBtn.addEventListener('click', () => {
@@ -300,47 +334,42 @@
             detailsModal.classList.add('show');
         };
 
-        // Complete email sign-up
+        // Complete email sign-up (passwordless)
         window.completeSignUp = function() {
             const email = document.getElementById('signup-email').value;
             const firstName = document.getElementById('first-name').value;
             const lastName = document.getElementById('last-name').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
 
-            if (!email || !firstName || !lastName || !password || !confirmPassword) {
+            if (!email || !firstName || !lastName) {
                 alert('Please fill in all fields');
                 return;
             }
-            if (password !== confirmPassword) {
-                alert('Passwords do not match');
-                return;
-            }
 
-            createUserWithEmailAndPassword(auth, email, password)
-                .then(userCredential => {
-                    updateProfile(userCredential.user, {
-                        displayName: `${firstName} ${lastName}`
-                    }).then(() => {
-                        detailsModal.classList.remove('show');
-                        window.location.href = 'chatbot.html';
-                    });
+            sendSignInLinkToEmail(auth, email, actionCodeSettings)
+                .then(() => {
+                    window.localStorage.setItem('emailForSignIn', email);
+                    window.localStorage.setItem('isSignup', 'true');
+                    window.localStorage.setItem('firstName', firstName);
+                    window.localStorage.setItem('lastName', lastName);
+                    alert('Sign-up link sent to your email. Please check and click the link to complete.');
+                    detailsModal.classList.remove('show');
                 })
                 .catch(error => alert(error.message));
         };
 
-        // Login
+        // Login (passwordless)
         window.login = function() {
             const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            if (!email || !password) {
-                alert('Please fill in all fields');
+            if (!email) {
+                alert('Please enter email');
                 return;
             }
-            signInWithEmailAndPassword(auth, email, password)
+            sendSignInLinkToEmail(auth, email, actionCodeSettings)
                 .then(() => {
+                    window.localStorage.setItem('emailForSignIn', email);
+                    window.localStorage.removeItem('isSignup');
+                    alert('Sign-in link sent to your email. Please check and click the link.');
                     loginModal.classList.remove('show');
-                    window.location.href = 'chatbot.html';
                 })
                 .catch(error => alert(error.message));
         };
@@ -414,8 +443,6 @@
             <h2>Complete Sign Up</h2>
             <input type="text" id="first-name" placeholder="First Name" required>
             <input type="text" id="last-name" placeholder="Last Name" required>
-            <input type="password" id="password" placeholder="Password" required>
-            <input type="password" id="confirm-password" placeholder="Confirm Password" required>
             <button class="btn" onclick="completeSignUp()">Submit</button>
         </div>
     </div>
@@ -426,9 +453,8 @@
             <span class="close" id="close-login">&times;</span>
             <h2>Login</h2>
             <input type="email" id="login-email" placeholder="Email" required>
-            <input type="password" id="login-password" placeholder="Password" required>
             <button class="btn" onclick="login()">Login</button>
         </div>
     </div>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'973a95c7ef81e61a',t:'MTc1NTk1MTg0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
