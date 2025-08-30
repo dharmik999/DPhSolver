@@ -5,7 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DPhSolver</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
@@ -165,9 +171,9 @@
         </defs>
         <path fill="url(#waveGradientBottom)" d="M0,30L48,50C96,70,192,110,288,90C384,70,480,30,576,20C672,10,768,30,864,50C960,70,1056,90,1152,70C1248,50,1344,-10,1392,-40L1440,-50L1440,150L1392,150C1344,150,1248,150,1152,150C1056,150,960,150,864,150C768,150,672,150,576,150C480,150,384,150,288,150C192,150,96,150,48,150L0,150Z"></path>
     </svg>
-    <div class="equation" style="top: 20%; left: 10%;">∫ f(x) dx = F(x) + C</div>
-    <div class="equation" style="top: 60%; left: 70%;">d/dx [f(x)] = f'(x)</div>
-    <div class="equation" style="top: 40%; left: 30%;">∑_{n=1}^∞ 1/n² = π²/6</div>
+    <div class="equation" style="top: 15%; left: 10%;">∫ f(x) dx = F(x) + C</div>
+    <div class="equation" style="top: 55%; left: 65%;">d/dx [f(x)] = f'(x)</div>
+    <div class="equation" style="top: 35%; left: 25%;">∑_{n=1}^∞ 1/n² = π²/6</div>
 
     <header class="gradient-bg py-8 shadow-2xl">
         <nav class="container mx-auto flex justify-between items-center px-10">
@@ -185,14 +191,14 @@
         <section id="home-section" class="container mx-auto py-32 text-center">
             <h2 class="text-8xl font-extrabold mb-10 gradient-text animate-bounce-slow">Welcome to DPhSolver</h2>
             <p class="text-4xl text-gray-200 mb-16 max-w-5xl mx-auto">Embark on a cosmic journey to solve physics problems with our AI-powered chatbot—faster than a speeding photon!</p>
-            <a id="get-started-btn" href="#chatbot" class="inline-block bg-gradient-to-r from-purple-600 to-rose-500 text-white px-16 py-6 rounded-full text-3xl font-bold magic-button pulse shadow-2xl animate-bounce-slow">Launch Now!</a>
+            <a id="get-started-btn" href="chatbot.html" class="inline-block bg-gradient-to-r from-purple-600 to-rose-500 text-white px-16 py-6 rounded-full text-3xl font-bold magic-button pulse shadow-2xl animate-bounce-slow">Launch Now!</a>
         </section>
 
         <section id="profile-section" class="container mx-auto py-32 hidden">
             <h2 class="text-7xl font-bold mb-12 text-center gradient-text">Your Profile</h2>
             <div class="max-w-2xl mx-auto bg-gray-800 p-16 rounded-3xl shadow-2xl">
                 <p id="user-email" class="text-gray-200 mb-12 text-2xl">Command your account and unlock the secrets of the universe with DPhSolver.</p>
-                <a href="#chatbot" class="block bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-5 rounded-full magic-button pulse mb-6 text-2xl font-bold">Go to Chatbot</a>
+                <a href="chatbot.html" class="block bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-5 rounded-full magic-button pulse mb-6 text-2xl font-bold">Go to Chatbot</a>
                 <a id="logout-profile-btn" href="#logout" class="block bg-gradient-to-r from-rose-600 to-rose-800 text-white px-12 py-5 rounded-full magic-button text-2xl font-bold">Logout</a>
             </div>
         </section>
@@ -245,11 +251,9 @@
     </footer>
 
     <script type="module">
-        // Import Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyADcAkqXqSZ_crzAaMCNu6IWUYQS5ZWrIY",
             authDomain: "sign-up-login-d1723.firebaseapp.com",
@@ -260,11 +264,9 @@
             measurementId: "G-XKX2CPZMQE"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // DOM elements
         const getStartedBtn = document.getElementById('get-started-btn');
         const loginBtn = document.getElementById('login-btn');
         const signupBtn = document.getElementById('signup-btn');
@@ -277,7 +279,6 @@
         const signupModal = document.getElementById('signup-modal');
         const closeSignup = document.getElementById('close-signup');
 
-        // Check auth state
         auth.onAuthStateChanged(user => {
             if (user) {
                 loginBtn.style.display = 'none';
@@ -296,7 +297,6 @@
             }
         });
 
-        // Open sign-up/login modal (both buttons trigger Google sign-in)
         getStartedBtn.addEventListener('click', () => {
             signupModal.classList.add('show');
         });
@@ -307,12 +307,10 @@
             signupModal.classList.add('show');
         });
 
-        // Close modal
         closeSignup.addEventListener('click', () => {
             signupModal.classList.remove('show');
         });
 
-        // Google Sign-In
         window.signInWithGoogle = function() {
             const provider = new GoogleAuthProvider();
             signInWithPopup(auth, provider)
@@ -323,7 +321,6 @@
                 .catch(error => alert(error.message));
         };
 
-        // Logout
         window.logout = function() {
             signOut(auth)
                 .then(() => {
@@ -332,7 +329,6 @@
                 .catch(error => alert(error.message));
         };
 
-        // Profile page navigation
         profileBtn.addEventListener('click', () => {
             homeSection.style.display = 'none';
             profileSection.style.display = 'block';
@@ -367,23 +363,15 @@
                     var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
                     var firstSheetName = workbook.SheetNames[0];
                     var worksheet = workbook.Sheets[firstSheetName];
-
-                    // Convert sheet to JSON to filter blank rows
                     var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                    // Filter out blank rows (rows where all cells are empty, null, or undefined)
                     var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                    // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
                     var headerRowIndex = filteredData.findIndex((row, index) =>
                         row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
                     );
-                    // Fallback
                     if (headerRowIndex === -1 || headerRowIndex > 25) {
                         headerRowIndex = 0;
                     }
-
-                    // Convert filtered JSON back to CSV
-                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
                     csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
                     return csv;
                 } catch (e) {
@@ -481,6 +469,5 @@
             canvas.height = window.innerHeight;
         });
     </script>
-    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'973a95c7ef81e61a',t:'MTc1NTk1MTg0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
