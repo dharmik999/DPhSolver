@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DPhSolver - Chatbot</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -210,6 +211,7 @@
     <header>
         <div class="logo">DPhSolver</div>
         <nav>
+            <a href="index.html" class="magic-button pulse px-6 py-3 text-lg">Home</a>
             <a href="#" id="logout-btn" class="magic-button pulse px-6 py-3 text-lg">Logout</a>
         </nav>
     </header>
@@ -223,7 +225,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
         import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyADcAkqXqSZ_crzAaMCNu6IWUYQS5ZWrIY",
             authDomain: "sign-up-login-d1723.firebaseapp.com",
@@ -234,14 +235,11 @@
             measurementId: "G-XKX2CPZMQE"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // DOM elements
         const logoutBtn = document.getElementById('logout-btn');
 
-        // Logout
         logoutBtn.addEventListener('click', () => {
             signOut(auth)
                 .then(() => {
@@ -250,7 +248,6 @@
                 .catch(error => alert(error.message));
         });
 
-        // Ensure iframe loads
         window.onload = function() {
             const iframe = document.querySelector('iframe');
             iframe.onload = () => console.log('Chatbot loaded successfully');
@@ -270,23 +267,15 @@
                     var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
                     var firstSheetName = workbook.SheetNames[0];
                     var worksheet = workbook.Sheets[firstSheetName];
-
-                    // Convert sheet to JSON to filter blank rows
                     var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                    // Filter out blank rows (rows where all cells are empty, null, or undefined)
                     var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                    // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
                     var headerRowIndex = filteredData.findIndex((row, index) =>
                         row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
                     );
-                    // Fallback
                     if (headerRowIndex === -1 || headerRowIndex > 25) {
                         headerRowIndex = 0;
                     }
-
-                    // Convert filtered JSON back to CSV
-                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
                     csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
                     return csv;
                 } catch (e) {
