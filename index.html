@@ -1,51 +1,250 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DPhSolver</title>
-    <script>
-            <script type="module">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 100%);
+            position: relative;
+            color: #ffffff;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #8B5CF6 0%, #F43F5E 100%);
+            animation: gradientFlow 12s ease infinite;
+        }
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .modal {
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .modal.hidden {
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+        }
+        .magic-button {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(45deg, #8B5CF6, #F43F5E);
+            box-shadow: 0 0 25px rgba(139, 92, 246, 0.9), 0 0 50px rgba(244, 63, 94, 0.7);
+            transition: all 0.4s ease;
+            border-radius: 9999px;
+            z-index: 10;
+        }
+        .magic-button:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 50px rgba(139, 92, 246, 1), 0 0 80px rgba(244, 63, 94, 0.9);
+        }
+        .magic-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            transition: 0.6s;
+        }
+        .magic-button:hover::before {
+            left: 100%;
+        }
+        .pulse {
+            animation: pulse 1s infinite ease-in-out;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.9); }
+            70% { box-shadow: 0 0 0 30px rgba(139, 92, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #8B5CF6, #F43F5E);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 4s ease infinite;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .particle-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .container { position: relative; z-index: 10; }
+        .glow-input {
+            transition: all 0.3s ease;
+        }
+        .glow-input:focus {
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.9);
+            border-color: #8B5CF6;
+        }
+        .animate-bounce-slow {
+            animation: bounce 2.5s infinite ease-in-out;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        .svg-decor {
+            position: absolute;
+            z-index: 5;
+            animation: waveGlow 3s infinite alternate;
+        }
+        @keyframes waveGlow {
+            0% { filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.8)); }
+            100% { filter: drop-shadow(0 0 20px rgba(244, 63, 94, 1)); }
+        }
+        .svg-decor-top {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 150px;
+        }
+        .svg-decor-bottom {
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 150px;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .equation {
+            position: absolute;
+            color: #ffffff;
+            font-family: 'Times New Roman', serif;
+            font-size: 24px;
+            opacity: 0.3;
+            z-index: 5;
+            animation: equationGlow 4s infinite alternate;
+            pointer-events: none;
+        }
+        @keyframes equationGlow {
+            0% { filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.7)); opacity: 0.3; }
+            100% { filter: drop-shadow(0 0 15px rgba(244, 63, 94, 0.9)); opacity: 0.5; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <canvas id="particleCanvas"></canvas>
+    <svg class="svg-decor svg-decor-top" viewBox="0 0 1440 150">
+        <defs>
+            <linearGradient id="waveGradientTop" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:0.7" />
+                <stop offset="100%" style="stop-color:#F43F5E;stop-opacity:0.7" />
+            </linearGradient>
+        </defs>
+        <path fill="url(#waveGradientTop)" d="M0,120L48,100C96,80,192,40,288,60C384,80,480,120,576,130C672,140,768,120,864,100C960,80,1056,60,1152,80C1248,100,1344,160,1392,190L1440,200L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+    </svg>
+    <svg class="svg-decor svg-decor-bottom" viewBox="0 0 1440 150">
+        <defs>
+            <linearGradient id="waveGradientBottom" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#F43F5E;stop-opacity:0.7" />
+                <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:0.7" />
+            </linearGradient>
+        </defs>
+        <path fill="url(#waveGradientBottom)" d="M0,30L48,50C96,70,192,110,288,90C384,70,480,30,576,20C672,10,768,30,864,50C960,70,1056,90,1152,70C1248,50,1344,-10,1392,-40L1440,-50L1440,150L1392,150C1344,150,1248,150,1152,150C1056,150,960,150,864,150C768,150,672,150,576,150C480,150,384,150,288,150C192,150,96,150,48,150L0,150Z"></path>
+    </svg>
+    <div class="equation" style="top: 20%; left: 10%;">∫ f(x) dx = F(x) + C</div>
+    <div class="equation" style="top: 60%; left: 70%;">d/dx [f(x)] = f'(x)</div>
+    <div class="equation" style="top: 40%; left: 30%;">∑_{n=1}^∞ 1/n² = π²/6</div>
+
+    <header class="gradient-bg py-8 shadow-2xl">
+        <nav class="container mx-auto flex justify-between items-center px-10">
+            <h1 class="text-6xl font-extrabold tracking-tight gradient-text">DPhSolver</h1>
+            <div class="space-x-10">
+                <a id="login-btn" href="#login" class="text-gray-200 hover:text-white transition font-semibold text-2xl">Login</a>
+                <a id="signup-btn" href="#signup" class="text-gray-200 hover:text-white transition font-semibold text-2xl">Sign Up</a>
+                <a id="profile-btn" href="#profile" class="text-gray-200 hover:text-white transition font-semibold text-2xl">Profile</a>
+                <a id="logout-btn" href="#logout" class="text-gray-200 hover:text-white transition font-semibold text-2xl">Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="flex-grow">
+        <section id="home-section" class="container mx-auto py-32 text-center">
+            <h2 class="text-8xl font-extrabold mb-10 gradient-text animate-bounce-slow">Welcome to DPhSolver</h2>
+            <p class="text-4xl text-gray-200 mb-16 max-w-5xl mx-auto">Embark on a cosmic journey to solve physics problems with our AI-powered chatbot—faster than a speeding photon!</p>
+            <a id="get-started-btn" href="#chatbot" class="inline-block bg-gradient-to-r from-purple-600 to-rose-500 text-white px-16 py-6 rounded-full text-3xl font-bold magic-button pulse shadow-2xl animate-bounce-slow">Launch Now!</a>
+        </section>
+
+        <section id="profile-section" class="container mx-auto py-32 hidden">
+            <h2 class="text-7xl font-bold mb-12 text-center gradient-text">Your Profile</h2>
+            <div class="max-w-2xl mx-auto bg-gray-800 p-16 rounded-3xl shadow-2xl">
+                <p id="user-email" class="text-gray-200 mb-12 text-2xl">Command your account and unlock the secrets of the universe with DPhSolver.</p>
+                <a href="#chatbot" class="block bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-5 rounded-full magic-button pulse mb-6 text-2xl font-bold">Go to Chatbot</a>
+                <a id="logout-profile-btn" href="#logout" class="block bg-gradient-to-r from-rose-600 to-rose-800 text-white px-12 py-5 rounded-full magic-button text-2xl font-bold">Logout</a>
+            </div>
+        </section>
+    </main>
+
+    <div id="signup-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden modal">
+        <div class="bg-gray-800 p-16 rounded-3xl shadow-2xl w-full max-w-xl">
+            <button id="close-signup" class="text-gray-300 hover:text-white float-right text-5xl">&times;</button>
+            <h2 class="text-6xl font-bold mb-12 gradient-text">Join the Cosmic Quest</h2>
+            <button onclick="signInWithGoogle()" class="w-full bg-gradient-to-r from-white to-gray-300 text-gray-900 px-12 py-6 rounded-full mb-6 magic-button pulse font-bold text-2xl">Sign Up with Google</button>
+            <button class="w-full bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-6 rounded-full magic-button pulse font-bold text-2xl">Sign Up with Email</button>
+        </div>
+    </div>
+
+    <div id="email-signup" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden modal">
+        <div class="bg-gray-800 p-16 rounded-3xl shadow-2xl w-full max-w-xl">
+            <button class="text-gray-300 hover:text-white float-right text-5xl">&times;</button>
+            <h2 class="text-6xl font-bold mb-12 gradient-text">Enter Your Email</h2>
+            <input type="email" placeholder="Your email" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
+            <button class="w-full bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-6 rounded-full magic-button pulse font-bold text-2xl">Next</button>
+        </div>
+    </div>
+
+    <div id="complete-signup" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden modal">
+        <div class="bg-gray-800 p-16 rounded-3xl shadow-2xl w-full max-w-xl">
+            <button class="text-gray-300 hover:text-white float-right text-5xl">&times;</button>
+            <h2 class="text-6xl font-bold mb-12 gradient-text">Complete Your Mission</h2>
+            <input type="text" placeholder="First Name" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
+            <input type="text" placeholder="Last Name" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
+            <input type="password" placeholder="Password" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
+            <input type="password" placeholder="Confirm Password" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
+            <button class="w-full bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-6 rounded-full magic-button pulse font-bold text-2xl">Submit</button>
+        </div>
+    </div>
+
+    <div id="login" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden modal">
+        <div class="bg-gray-800 p-16 rounded-3xl shadow-2xl w-full max-w-xl">
+            <button class="text-gray-300 hover:text-white float-right text-5xl">&times;</button>
+            <h2 class="text-6xl font-bold mb-12 gradient-text">Login to DPhSolver</h2>
+            <input type="email" placeholder="Email" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
+            <input type="password" placeholder="Password" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
+            <button class="w-full bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-6 rounded-full magic-button pulse font-bold text-2xl">Login</button>
+        </div>
+    </div>
+
+    <footer class="gradient-bg py-10">
+        <div class="container mx-auto text-center text-gray-300">
+            <p>&copy; 2025 DPhSolver. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script type="module">
         // Import Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
@@ -139,7 +338,6 @@
             profileSection.style.display = 'block';
         });
     </script>
-    <!-- Schema Markup for Software Application -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -156,216 +354,46 @@
         }
     }
     </script>
+    <script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+            return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+            if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+                try {
+                    var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                    var firstSheetName = workbook.SheetNames[0];
+                    var worksheet = workbook.Sheets[firstSheetName];
+
+                    // Convert sheet to JSON to filter blank rows
+                    var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                    // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                    var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                    // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                    var headerRowIndex = filteredData.findIndex((row, index) =>
+                        row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                    );
+                    // Fallback
+                    if (headerRowIndex === -1 || headerRowIndex > 25) {
+                        headerRowIndex = 0;
+                    }
+
+                    // Convert filtered JSON back to CSV
+                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                    csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                    return csv;
+                } catch (e) {
+                    console.error(e);
+                    return "";
+                }
+            }
+            return gk_fileData[filename] || "";
+        }
     </script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 100%);
-            position: relative;
-            color: #ffffff;
-        }
-        .gradient-bg {
-            background: linear-gradient(135deg, #8B5CF6 0%, #F43F5E 100%);
-            animation: gradientFlow 10s ease infinite;
-        }
-        @keyframes gradientFlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .modal {
-            transition: opacity 0.5s ease, transform 0.5s ease;
-        }
-        .modal.hidden {
-            opacity: 0;
-            transform: scale(0.8);
-            pointer-events: none;
-        }
-        .magic-button {
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(45deg, #8B5CF6, #F43F5E);
-            box-shadow: 0 0 25px rgba(139, 92, 246, 0.9), 0 0 50px rgba(244, 63, 94, 0.7);
-            transition: all 0.4s ease;
-            border-radius: 9999px;
-            z-index: 10;
-        }
-        .magic-button:hover {
-            transform: scale(1.2);
-            box-shadow: 0 0 50px rgba(139, 92, 246, 1), 0 0 80px rgba(244, 63, 94, 0.9);
-        }
-        .magic-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
-            transition: 0.6s;
-        }
-        .magic-button:hover::before {
-            left: 100%;
-        }
-        .pulse {
-            animation: pulse 1s infinite ease-in-out;
-        }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.9); }
-            70% { box-shadow: 0 0 0 30px rgba(139, 92, 246, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
-        }
-        .gradient-text {
-            background: linear-gradient(90deg, #8B5CF6, #F43F5E);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradientShift 4s ease infinite;
-        }
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .particle-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-        .container { position: relative; z-index: 10; }
-        .glow-input {
-            transition: all 0.3s ease;
-        }
-        .glow-input:focus {
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.9);
-            border-color: #8B5CF6;
-        }
-        .animate-bounce-slow {
-            animation: bounce 2.5s infinite ease-in-out;
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-        .svg-decor {
-            position: absolute;
-            opacity: 0.5;
-            z-index: 5;
-            animation: waveGlow 3s infinite alternate;
-        }
-        @keyframes waveGlow {
-            0% { filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.8)); }
-            100% { filter: drop-shadow(0 0 15px rgba(244, 63, 94, 1)); }
-        }
-        .svg-decor-top {
-            top: 0;
-            left: 0;
-            width: 100%;
-        }
-        .svg-decor-bottom {
-            bottom: 0;
-            right: 0;
-            width: 100%;
-        }
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col">
-    <canvas id="particleCanvas"></canvas>
-    <svg class="svg-decor svg-decor-top" viewBox="0 0 1440 320">
-        <path fill="#8B5CF6" fill-opacity="0.5" d="M0,192L48,176C96,160,192,128,288,149.3C384,171,480,245,576,245.3C672,245,768,171,864,154.7C960,139,1056,181,1152,192C1248,203,1344,181,1392,170.7L1440,160L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
-    </svg>
-    <svg class="svg-decor svg-decor-bottom" viewBox="0 0 1440 320">
-        <path fill="#F43F5E" fill-opacity="0.5" d="M0,288L48,272C96,256,192,224,288,213.3C384,203,480,213,576,229.3C672,245,768,267,864,245.3C960,224,1056,160,1152,149.3C1248,139,1344,181,1392,202.7L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-    </svg>
-
-    <header class="gradient-bg py-8 shadow-2xl">
-        <nav class="container mx-auto flex justify-between items-center px-10">
-            <h1 class="text-6xl font-extrabold tracking-tight gradient-text">DPhSolver</h1>
-            <div class="space-x-10">
-                <a href="#login" class="text-gray-200 hover:text-white transition font-semibold text-2xl">Login</a>
-                <a href="#signup" class="text-gray-200 hover:text-white transition font-semibold text-2xl">Sign Up</a>
-                <a href="#profile" class="text-gray-200 hover:text-white transition font-semibold text-2xl">Profile</a>
-                <a href="#logout" class="text-gray-200 hover:text-white transition font-semibold text-2xl">Logout</a>
-            </div>
-        </nav>
-    </header>
-
-    <main class="flex-grow">
-        <section class="container mx-auto py-32 text-center">
-            <h2 class="text-8xl font-extrabold mb-10 gradient-text animate-bounce-slow">Welcome to DPhSolver</h2>
-            <p class="text-4xl text-gray-200 mb-16 max-w-5xl mx-auto">Embark on a cosmic journey to solve physics problems with our AI-powered chatbot—faster than a speeding photon!</p>
-            <a href="#chatbot" class="inline-block bg-gradient-to-r from-purple-600 to-rose-500 text-white px-16 py-6 rounded-full text-3xl font-bold magic-button pulse shadow-2xl animate-bounce-slow">Launch Now!</a>
-        </section>
-
-        <section id="profile" class="container mx-auto py-32 hidden">
-            <h2 class="text-7xl font-bold mb-12 text-center gradient-text">Your Profile</h2>
-            <div class="max-w-2xl mx-auto bg-gray-800 p-16 rounded-3xl shadow-2xl">
-                <p class="text-gray-200 mb-12 text-2xl">Command your account and unlock the secrets of the universe with DPhSolver.</p>
-                <a href="#chatbot" class="block bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-5 rounded-full magic-button pulse mb-6 text-2xl font-bold">Go to Chatbot</a>
-                <a href="#logout" class="block bg-gradient-to-r from-rose-600 to-rose-800 text-white px-12 py-5 rounded-full magic-button text-2xl font-bold">Logout</a>
-            </div>
-        </section>
-    </main>
-
-    <div id="signup" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden modal">
-        <div class="bg-gray-800 p-16 rounded-3xl shadow-2xl w-full max-w-xl">
-            <button class="text-gray-300 hover:text-white float-right text-5xl">&times;</button>
-            <h2 class="text-6xl font-bold mb-12 gradient-text">Join the Cosmic Quest</h2>
-            <button class="w-full bg-gradient-to-r from-white to-gray-300 text-gray-900 px-12 py-6 rounded-full mb-6 magic-button pulse font-bold text-2xl">Sign Up with Google</button>
-            <button class="w-full bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-6 rounded-full magic-button pulse font-bold text-2xl">Sign Up with Email</button>
-        </div>
-    </div>
-
-    <div id="email-signup" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden modal">
-        <div class="bg-gray-800 p-16 rounded-3xl shadow-2xl w-full max-w-xl">
-            <button class="text-gray-300 hover:text-white float-right text-5xl">&times;</button>
-            <h2 class="text-6xl font-bold mb-12 gradient-text">Enter Your Email</h2>
-            <input type="email" placeholder="Your email" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
-            <button class="w-full bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-6 rounded-full magic-button pulse font-bold text-2xl">Next</button>
-        </div>
-    </div>
-
-    <div id="complete-signup" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden modal">
-        <div class="bg-gray-800 p-16 rounded-3xl shadow-2xl w-full max-w-xl">
-            <button class="text-gray-300 hover:text-white float-right text-5xl">&times;</button>
-            <h2 class="text-6xl font-bold mb-12 gradient-text">Complete Your Mission</h2>
-            <input type="text" placeholder="First Name" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
-            <input type="text" placeholder="Last Name" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
-            <input type="password" placeholder="Password" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
-            <input type="password" placeholder="Confirm Password" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
-            <button class="w-full bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-6 rounded-full magic-button pulse font-bold text-2xl">Submit</button>
-        </div>
-    </div>
-
-    <div id="login" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden modal">
-        <div class="bg-gray-800 p-16 rounded-3xl shadow-2xl w-full max-w-xl">
-            <button class="text-gray-300 hover:text-white float-right text-5xl">&times;</button>
-            <h2 class="text-6xl font-bold mb-12 gradient-text">Login to DPhSolver</h2>
-            <input type="email" placeholder="Email" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
-            <input type="password" placeholder="Password" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
-            <button class="w-full bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-6 rounded-full magic-button pulse font-bold text-2xl">Login</button>
-        </div>
-    </div>
-
-    <footer class="gradient-bg py-10">
-        <div class="container mx-auto text-center text-gray-300">
-            <p>&copy; 2025 DPhSolver. All rights reserved.</p>
-        </div>
-    </footer>
-
     <script>
         const canvas = document.getElementById('particleCanvas');
         const ctx = canvas.getContext('2d');
@@ -379,10 +407,10 @@
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 5 + 2;
-                this.speedX = Math.random() * 0.5 - 0.25;
-                this.speedY = Math.random() * 0.5 - 0.25;
-                this.opacity = Math.random() * 0.5 + 0.3;
+                this.size = Math.random() * 6 + 3;
+                this.speedX = Math.random() * 0.6 - 0.3;
+                this.speedY = Math.random() * 0.6 - 0.3;
+                this.opacity = Math.random() * 0.4 + 0.4;
                 this.color = Math.random() > 0.5 ? 'rgba(139, 92, 246, ' : 'rgba(244, 63, 94, ';
             }
             update() {
@@ -390,44 +418,52 @@
                 this.y += this.speedY;
                 if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
                 if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
-                this.opacity = 0.3 + Math.sin(Date.now() / 1000 + this.x) * 0.2;
+                this.opacity = 0.4 + Math.sin(Date.now() / 800 + this.x) * 0.3;
+                this.size = 3 + Math.sin(Date.now() / 1000 + this.y) * 2;
             }
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fillStyle = `${this.color}${this.opacity})`;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color + '1)';
                 ctx.fill();
+                ctx.shadowBlur = 0;
             }
         }
 
         class Equation {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.texts = ["∫ f(x) dx = F(x) + C", "d/dx [f(x)] = f'(x)", "∑_{n=1}^∞ 1/n² = π²/6"];
-                this.text = this.texts[Math.floor(Math.random() * this.texts.length)];
-                this.fontSize = Math.random() * 20 + 15;
-                this.speedX = Math.random() * 0.2 - 0.1;
-                this.speedY = Math.random() * 0.2 - 0.1;
-                this.opacity = Math.random() * 0.3 + 0.2;
+            constructor(x, y, text) {
+                this.x = x;
+                this.y = y;
+                this.text = text;
+                this.fontSize = Math.random() * 20 + 20;
+                this.speedX = Math.random() * 0.15 - 0.075;
+                this.speedY = Math.random() * 0.15 - 0.075;
+                this.opacity = Math.random() * 0.3 + 0.3;
             }
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
                 if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
                 if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
-                this.opacity = 0.3 + Math.sin(Date.now() / 2000) * 0.2;
+                this.opacity = 0.3 + Math.sin(Date.now() / 1500) * 0.2;
             }
             draw() {
-                ctx.font = `${this.fontSize}px serif`;
+                ctx.font = `${this.fontSize}px 'Times New Roman', serif`;
                 ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = 'rgba(139, 92, 246, 0.7)';
                 ctx.fillText(this.text, this.x, this.y);
+                ctx.shadowBlur = 0;
             }
         }
 
         function init() {
-            for (let i = 0; i < 100; i++) particles.push(new Particle());
-            for (let i = 0; i < 3; i++) equations.push(new Equation());
+            for (let i = 0; i < 150; i++) particles.push(new Particle());
+            equations.push(new Equation(canvas.width * 0.15, canvas.height * 0.25, "∫ f(x) dx = F(x) + C"));
+            equations.push(new Equation(canvas.width * 0.65, canvas.height * 0.65, "d/dx [f(x)] = f'(x)"));
+            equations.push(new Equation(canvas.width * 0.35, canvas.height * 0.45, "∑_{n=1}^∞ 1/n² = π²/6"));
         }
 
         function animate() {
@@ -445,7 +481,6 @@
             canvas.height = window.innerHeight;
         });
     </script>
-
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'973a95c7ef81e61a',t:'MTc1NTk1MTg0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'973a95c7ef81e61a',t:'MTc1NTk1MTg0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
