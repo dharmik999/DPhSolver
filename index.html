@@ -35,6 +35,7 @@
             opacity: 0;
             transform: scale(0.8);
             pointer-events: none;
+            display: none;
         }
         .magic-button {
             position: relative;
@@ -172,8 +173,8 @@
             <div class="space-x-10">
                 <a id="login-btn" href="#login" class="text-gray-200 hover:text-white transition font-semibold text-2xl">Login</a>
                 <a id="signup-btn" href="#signup" class="text-gray-200 hover:text-white transition font-semibold text-2xl">Sign Up</a>
-                <a id="profile-btn" href="#profile" class="text-gray-200 hover:text-white transition font-semibold text-2xl">Profile</a>
-                <a id="logout-btn" href="#logout" class="text-gray-200 hover:text-white transition font-semibold text-2xl">Logout</a>
+                <a id="profile-btn" href="#profile" class="text-gray-200 hover:text-white transition font-semibold text-2xl hidden">Profile</a>
+                <a id="logout-btn" href="#logout" class="text-gray-200 hover:text-white transition font-semibold text-2xl hidden">Logout</a>
             </div>
         </nav>
     </header>
@@ -181,8 +182,8 @@
     <main class="flex-grow">
         <section id="home-section" class="container mx-auto py-32 text-center">
             <h2 class="text-8xl font-extrabold mb-10 gradient-text animate-bounce-slow">Welcome to DPhSolver</h2>
-            <p class="text-4xl text-gray-200 mb-16 max-w-5xl mx-auto">Embark on a cosmic journey to solve physics problems with our AI-powered chatbot—faster than a speeding photon!</p>
-            <a id="get-started-btn" class="inline-block bg-gradient-to-r from-purple-600 to-rose-500 text-white px-16 py-6 rounded-full text-3xl font-bold magic-button pulse shadow-2xl animate-bounce-slow">Launch Now!</a>
+            <p class="text-4xl text-gray-200 mb-16 max-w-5xl mx-auto">Solve physics problems with ease using our AI-powered chatbot.</p>
+            <a id="get-started-btn" class="inline-block bg-gradient-to-r from-purple-600 to-rose-500 text-white px-16 py-6 rounded-full text-3xl font-bold magic-button pulse shadow-2xl animate-bounce-slow">Get Started</a>
         </section>
 
         <section id="profile-section" class="container mx-auto py-32 hidden">
@@ -198,40 +199,40 @@
     <div id="signup-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden modal">
         <div class="bg-gray-800 p-16 rounded-3xl shadow-2xl w-full max-w-xl">
             <button id="close-signup" class="text-gray-300 hover:text-white float-right text-5xl">&times;</button>
-            <h2 class="text-6xl font-bold mb-12 gradient-text">Join the Cosmic Quest</h2>
-            <button onclick="signInWithGoogle()" class="w-full bg-gradient-to-r from-white to-gray-300 text-gray-900 px-12 py-6 rounded-full mb-6 magic-button pulse font-bold text-2xl">Sign Up with Google</button>
-            <button class="w-full bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-6 rounded-full magic-button pulse font-bold text-2xl">Sign Up with Email</button>
+            <h2 class="text-6xl font-bold mb-12 gradient-text">Sign Up</h2>
+            <button id="google-signup" class="w-full bg-gradient-to-r from-white to-gray-300 text-gray-900 px-12 py-6 rounded-full mb-6 magic-button pulse font-bold text-2xl">Sign Up with Google</button>
+            <button id="email-signup-btn" class="w-full bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-6 rounded-full magic-button pulse font-bold text-2xl">Sign Up with Email</button>
         </div>
     </div>
 
     <div id="email-signup" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden modal">
         <div class="bg-gray-800 p-16 rounded-3xl shadow-2xl w-full max-w-xl">
-            <button class="text-gray-300 hover:text-white float-right text-5xl">&times;</button>
-            <h2 class="text-6xl font-bold mb-12 gradient-text">Enter Your Email</h2>
-            <input type="email" placeholder="Your email" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
-            <button class="w-full bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-6 rounded-full magic-button pulse font-bold text-2xl">Next</button>
+            <button id="close-email-signup" class="text-gray-300 hover:text-white float-right text-5xl">&times;</button>
+            <h2 class="text-6xl font-bold mb-12 gradient-text">Enter Email</h2>
+            <input id="email-input" type="email" placeholder="Your email" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
+            <button id="email-signup-next" class="w-full bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-6 rounded-full magic-button pulse font-bold text-2xl">Next</button>
         </div>
     </div>
 
     <div id="complete-signup" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden modal">
         <div class="bg-gray-800 p-16 rounded-3xl shadow-2xl w-full max-w-xl">
-            <button class="text-gray-300 hover:text-white float-right text-5xl">&times;</button>
-            <h2 class="text-6xl font-bold mb-12 gradient-text">Complete Your Mission</h2>
-            <input type="text" placeholder="First Name" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
-            <input type="text" placeholder="Last Name" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
-            <input type="password" placeholder="Password" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
-            <input type="password" placeholder="Confirm Password" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
-            <button class="w-full bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-6 rounded-full magic-button pulse font-bold text-2xl">Submit</button>
+            <button id="close-complete-signup" class="text-gray-300 hover:text-white float-right text-5xl">&times;</button>
+            <h2 class="text-6xl font-bold mb-12 gradient-text">Complete Sign Up</h2>
+            <input id="first-name" type="text" placeholder="First Name" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
+            <input id="last-name" type="text" placeholder="Last Name" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
+            <input id="password" type="password" placeholder="Password" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
+            <input id="confirm-password" type="password" placeholder="Confirm Password" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
+            <button id="complete-signup-submit" class="w-full bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-6 rounded-full magic-button pulse font-bold text-2xl">Submit</button>
         </div>
     </div>
 
-    <div id="login" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden modal">
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden modal">
         <div class="bg-gray-800 p-16 rounded-3xl shadow-2xl w-full max-w-xl">
-            <button class="text-gray-300 hover:text-white float-right text-5xl">&times;</button>
-            <h2 class="text-6xl font-bold mb-12 gradient-text">Login to DPhSolver</h2>
-            <input type="email" placeholder="Email" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
-            <input type="password" placeholder="Password" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
-            <button class="w-full bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-6 rounded-full magic-button pulse font-bold text-2xl">Login</button>
+            <button id="close-login" class="text-gray-300 hover:text-white float-right text-5xl">&times;</button>
+            <h2 class="text-6xl font-bold mb-12 gradient-text">Login</h2>
+            <input id="login-email" type="email" placeholder="Email" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
+            <input id="login-password" type="password" placeholder="Password" class="w-full bg-gray-700 text-white px-8 py-6 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 glow-input transition text-xl">
+            <button id="login-submit" class="w-full bg-gradient-to-r from-purple-600 to-rose-500 text-white px-12 py-6 rounded-full magic-button pulse font-bold text-2xl">Login</button>
         </div>
     </div>
 
@@ -242,8 +243,8 @@
     </footer>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyADcAkqXqSZ_crzAaMCNu6IWUYQS5ZWrIY",
@@ -268,23 +269,43 @@
         const profileSection = document.getElementById('profile-section');
         const userEmail = document.getElementById('user-email');
         const signupModal = document.getElementById('signup-modal');
+        const loginModal = document.getElementById('login-modal');
+        const emailSignupModal = document.getElementById('email-signup');
+        const completeSignupModal = document.getElementById('complete-signup');
         const closeSignup = document.getElementById('close-signup');
+        const closeLogin = document.getElementById('close-login');
+        const closeEmailSignup = document.getElementById('close-email-signup');
+        const closeCompleteSignup = document.getElementById('close-complete-signup');
+        const googleSignup = document.getElementById('google-signup');
+        const emailSignupBtn = document.getElementById('email-signup-btn');
+        const emailSignupNext = document.getElementById('email-signup-next');
+        const completeSignupSubmit = document.getElementById('complete-signup-submit');
+        const loginSubmit = document.getElementById('login-submit');
+
+        function showModal(modal) {
+            [signupModal, loginModal, emailSignupModal, completeSignupModal].forEach(m => m.classList.add('hidden'));
+            modal.classList.remove('hidden');
+        }
+
+        function hideAllModals() {
+            [signupModal, loginModal, emailSignupModal, completeSignupModal].forEach(m => m.classList.add('hidden'));
+        }
 
         auth.onAuthStateChanged(user => {
             if (user) {
-                loginBtn.style.display = 'none';
-                signupBtn.style.display = 'none';
-                profileBtn.style.display = 'inline';
-                logoutBtn.style.display = 'inline';
+                loginBtn.classList.add('hidden');
+                signupBtn.classList.add('hidden');
+                profileBtn.classList.remove('hidden');
+                logoutBtn.classList.remove('hidden');
                 userEmail.textContent = `Logged in as: ${user.displayName || user.email}`;
             } else {
-                loginBtn.style.display = 'inline';
-                signupBtn.style.display = 'inline';
-                profileBtn.style.display = 'none';
-                logoutBtn.style.display = 'none';
+                loginBtn.classList.remove('hidden');
+                signupBtn.classList.remove('hidden');
+                profileBtn.classList.add('hidden');
+                logoutBtn.classList.add('hidden');
                 userEmail.textContent = '';
-                homeSection.style.display = 'block';
-                profileSection.style.display = 'none';
+                homeSection.classList.remove('hidden');
+                profileSection.classList.add('hidden');
             }
         });
 
@@ -293,44 +314,155 @@
                 if (user) {
                     window.location.href = 'chatbot.html';
                 } else {
-                    signupModal.classList.add('show');
+                    showModal(signupModal);
                 }
             });
         });
 
         signupBtn.addEventListener('click', () => {
-            signupModal.classList.add('show');
+            showModal(signupModal);
         });
 
         loginBtn.addEventListener('click', () => {
-            signupModal.classList.add('show');
+            showModal(loginModal);
+        });
+
+        profileBtn.addEventListener('click', () => {
+            homeSection.classList.add('hidden');
+            profileSection.classList.remove('hidden');
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            signOut(auth)
+                .then(() => {
+                    window.location.hash = '';
+                    homeSection.classList.remove('hidden');
+                    profileSection.classList.add('hidden');
+                })
+                .catch(error => alert(error.message));
+        });
+
+        logoutProfileBtn.addEventListener('click', () => {
+            signOut(auth)
+                .then(() => {
+                    window.location.hash = '';
+                    homeSection.classList.remove('hidden');
+                    profileSection.classList.add('hidden');
+                })
+                .catch(error => alert(error.message));
         });
 
         closeSignup.addEventListener('click', () => {
-            signupModal.classList.remove('show');
+            hideAllModals();
+            window.location.hash = '';
         });
 
-        window.signInWithGoogle = function() {
+        closeLogin.addEventListener('click', () => {
+            hideAllModals();
+            window.location.hash = '';
+        });
+
+        closeEmailSignup.addEventListener('click', () => {
+            hideAllModals();
+            window.location.hash = '';
+        });
+
+        closeCompleteSignup.addEventListener('click', () => {
+            hideAllModals();
+            window.location.hash = '';
+        });
+
+        googleSignup.addEventListener('click', () => {
             const provider = new GoogleAuthProvider();
             signInWithPopup(auth, provider)
-                .then(result => {
-                    signupModal.classList.remove('show');
+                .then(() => {
+                    hideAllModals();
                     window.location.href = 'chatbot.html';
                 })
                 .catch(error => alert(error.message));
-        };
+        });
 
-        window.logout = function() {
-            signOut(auth)
+        emailSignupBtn.addEventListener('click', () => {
+            showModal(emailSignupModal);
+        });
+
+        emailSignupNext.addEventListener('click', () => {
+            const email = document.getElementById('email-input').value;
+            if (email) {
+                showModal(completeSignupModal);
+            } else {
+                alert('Please enter a valid email.');
+            }
+        });
+
+        completeSignupSubmit.addEventListener('click', () => {
+            const email = document.getElementById('email-input').value;
+            const firstName = document.getElementById('first-name').value;
+            const lastName = document.getElementById('last-name').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match.');
+                return;
+            }
+
+            createUserWithEmailAndPassword(auth, email, password)
+                .then(userCredential => {
+                    const user = userCredential.user;
+                    return updateProfile(user, {
+                        displayName: `${firstName} ${lastName}`
+                    });
+                })
                 .then(() => {
-                    window.location.href = 'index.html';
+                    hideAllModals();
+                    window.location.href = 'chatbot.html';
                 })
                 .catch(error => alert(error.message));
-        };
+        });
 
-        profileBtn.addEventListener('click', () => {
-            homeSection.style.display = 'none';
-            profileSection.style.display = 'block';
+        loginSubmit.addEventListener('click', () => {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then(() => {
+                    hideAllModals();
+                    window.location.href = 'chatbot.html';
+                })
+                .catch(error => alert(error.message));
+        });
+
+        window.addEventListener('hashchange', () => {
+            const hash = window.location.hash;
+            hideAllModals();
+            homeSection.classList.add('hidden');
+            profileSection.classList.add('hidden');
+
+            if (hash === '#login') {
+                showModal(loginModal);
+            } else if (hash === '#signup') {
+                showModal(signupModal);
+            } else if (hash === '#profile') {
+                auth.onAuthStateChanged(user => {
+                    if (user) {
+                        homeSection.classList.add('hidden');
+                        profileSection.classList.remove('hidden');
+                    } else {
+                        showModal(signupModal);
+                    }
+                });
+            } else if (hash === '#logout') {
+                signOut(auth)
+                    .then(() => {
+                        window.location.hash = '';
+                        homeSection.classList.remove('hidden');
+                        profileSection.classList.add('hidden');
+                    })
+                    .catch(error => alert(error.message));
+            } else {
+                homeSection.classList.remove('hidden');
+            }
         });
     </script>
     <script type="application/ld+json">
