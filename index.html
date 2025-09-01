@@ -1,42 +1,4 @@
 <!DOCTYPE html>
-<html lang="header">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DPhSolver - Chatbot</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            background: linear-gradient(135deg, #0F172A 0%, #1Eегка
-
-System: It looks like the response was cut off. I'll provide the complete modified HTML code with the requested changes: disabling the hover highlight effect for navigation links and removing the background particle animation. The changes include:
-
-1. **Removing hover highlight effects**:
-   - Removed `transform: scale(1.1)` from `header nav a:hover`.
-   - Removed `magic-button` hover effects, including `transform: scale(1.2)` and the `::before` pseudo-element animation.
-   - Removed the `pulse` animation from buttons.
-
-2. **Removing background particle animation**:
-   - Removed the `<canvas id="particleCanvas"></canvas>` element.
-   - Removed the particle animation script (with `Particle` and `Equation` classes, `init`, and `animate` functions).
-   - Kept the floating equations in the HTML but removed their animation by deleting the `equationGlow` animation and related styles.
-
-3. **Preserving other functionality**:
-   - Kept the Firebase authentication script and XLSX file handling script unchanged.
-   - Retained the SVG decorations and other styles, except for the animations tied to the removed effects.
-
-Here’s the complete modified code:
-
-```html
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -83,10 +45,6 @@ Here’s the complete modified code:
             margin-left: 1.5rem;
             font-size: 1.2rem;
             font-weight: 600;
-            transition: color 0.3s;
-        }
-        header nav a:hover {
-            color: #ffffff;
         }
         .chatbot-section {
             padding: 7rem 2rem;
@@ -115,6 +73,24 @@ Here’s the complete modified code:
             box-shadow: 0 0 30px rgba(139, 92, 246, 0.7), 0 0 50px rgba(244, 63, 94, 0.5);
             margin: 0 auto;
         }
+        .particle-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
         .svg-decor {
             position: absolute;
             z-index: 5;
@@ -141,10 +117,12 @@ Here’s the complete modified code:
             pointer-events: none;
         }
         .magic-button {
+            position: relative;
+            overflow: hidden;
             background: linear-gradient(45deg, #8B5CF6, #F43F5E);
+            box-shadow: 0 0 25px rgba(139, 92, 246, 0.9), 0 0 50px rgba(244, 63, 94, 0.7);
             border-radius: 9999px;
             z-index: 10;
-            padding: 0.75rem 1.5rem;
         }
         footer {
             background: linear-gradient(135deg, #8B5CF6 0%, #F43F5E 100%);
